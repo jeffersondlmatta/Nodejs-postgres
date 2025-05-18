@@ -1,0 +1,28 @@
+{
+  "type": "module",
+  "name": "appnode-crud",
+  "version": "1.0.0",
+  "description": "app com node api e crud ",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "express",
+    "express",
+    "handlebar",
+    "bootstrap",
+    "postgres"
+  ],
+  "author": "jefferson",
+  "license": "ISC",
+  "dependencies": {
+    "appnode-crud": "file:",
+    "bootstrap": "^5.3.6",
+    "express": "^5.1.0",
+    "express-fileupload": "1.5.1",
+    "express-handlebars": "^8.0.2",
+    "nodemon": "^3.1.10",
+    "pg": "^8.16.0"
+  }
+}
