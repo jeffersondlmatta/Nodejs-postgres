@@ -16,6 +16,7 @@ app.use(fileUpload());
 //adcionar bootstrap
 app.use('/bootstrap', express.static('node_modules/bootstrap/dist'));
 app.use('/css', express.static('./css'));
+app.use('/imagens', express.static('./imagens'));
 
 import { Client } from 'pg';
 
@@ -44,22 +45,50 @@ client.connect()
 
   //rota prinipal
 app.get('/', (req, res) => {
-    res.render('formulario');
+    let sql = 'SELECT * FROM produtos';
+
+    client.query(sql, (erro, retorno) => {
+      res.render('formulario',{produtos: retorno.rows});
+
+
+    });
 });
 
 //rota cadastro 
 app.post('/cadastrar', (req, res) => {
-  console.log(req.body);
-  console.log(req.files.imagem.name);
+  const { nome, valor } = req.body;
+  const imagemFile = req.files?.imagem;
 
-  const caminho = path.join(__dirname, 'imagens', req.files.imagem.name);
+  if (!imagemFile) {
+    return res.status(400).send('Imagem não enviada.');
+  }
 
-  req.files.imagem.mv(caminho, (err) => {
-    if (err) return res.status(500).send(err);
-    res.send('Upload realizado com sucesso!');
-    
+  const imagemNome = imagemFile.name;
+  const caminho = path.join(__dirname, 'imagens', imagemNome);
+
+  // 1. Insere no banco
+  const sql = 'INSERT INTO produtos (nome, valor, imagem) VALUES ($1, $2, $3)';
+  const values = [nome, valor, imagemNome];
+
+  client.query(sql, values, (erro, retorno) => {
+    if (erro) {
+      console.error('Erro ao inserir no banco:', erro);
+      return res.status(500).send('Erro ao inserir no banco.');
+    }
+
+    // 2. Move o arquivo após inserir no banco
+    imagemFile.mv(caminho, (err) => {
+      if (err) {
+        console.error('Erro ao mover a imagem:', err);
+        return res.status(500).send('Erro ao salvar a imagem');
+      }
+
+      // 3. Redireciona após salvar tudo com sucesso
+      res.redirect('/');
+    });
   });
 });
+
 
 
 //servidor
