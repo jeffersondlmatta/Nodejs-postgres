@@ -4,6 +4,7 @@ import fileUpload from 'express-fileupload';
 
 import path from 'path';
 import { fileURLToPath } from 'url';
+import fs from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -19,6 +20,8 @@ app.use('/css', express.static('./css'));
 app.use('/imagens', express.static('./imagens'));
 
 import { Client } from 'pg';
+import { log } from 'console';
+
 
 
 //configura handlesbars
@@ -89,7 +92,27 @@ app.post('/cadastrar', (req, res) => {
   });
 });
 
+// Rota para remover produtos
+app.get('/remover/:codigo&:imagem', function(req, res){
+    
+    // SQL
+    let sql = `DELETE FROM produtos WHERE codigo = ${req.params.codigo}`;
 
+    // Executar o comando SQL
+    client.query(sql, function(erro, retorno){
+        // Caso falhe o comando SQL
+        if(erro) throw erro;
+
+        // Caso o comando SQL funcione
+        fs.unlink(__dirname+'/imagens/'+req.params.imagem, (erro_imagem)=>{
+            console.log('Falha ao remover a imagem ');
+        });
+    });
+
+    // Redirecionamento
+    res.redirect('/');
+
+});
 
 //servidor
 app.listen(8080);
