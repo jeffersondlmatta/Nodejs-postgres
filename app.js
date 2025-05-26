@@ -114,5 +114,62 @@ app.get('/remover/:codigo&:imagem', function(req, res){
 
 });
 
+//rota editar chama a funcção sql 
+app.get('/formularioEditar/:codigo', function(req, res){
+    // SQL
+    let sql = `SELECT * FROM produtos WHERE codigo = ${req.params.codigo}`;
+
+    // Executar o comando SQL
+    client.query(sql, function(erro, retorno){
+        // Caso falhe o comando SQL
+        if(erro) throw erro;
+
+        // Caso o comando SQL funcione
+        res.render('formularioEditar', {produto:retorno.rows[0]});
+    });
+});
+
+
+// Rota para editar produtos
+app.post('/editar', function(req, res){
+
+    // Obter os dados do formulário
+    let nome = req.body.nome;
+    let valor = req.body.valor;
+    let codigo = req.body.codigo;
+    let nomeImagem = req.body.nomeImagem;
+
+    try{
+      let imagem = req.files.imagem;
+      
+      //executa sql
+      let sql = `UPDATE produtos SET nome = '${nome}', valor = ${valor}, imagem = '${imagem.name}' WHERE codigo = ${codigo}`;
+      client.query(sql, (erro, retorno) => {
+        if(erro) throw erro;
+
+        // Mover a imagem antiaga
+        fs.unlink(__dirname + '/imagens/' + nomeImagem, (erro_imagem) => {
+        if (erro_imagem) {
+        //console.log('Falha ao remover a imagem antiga:', erro_imagem.message);
+  }
+});
+
+      imagem.mv(__dirname+'/imagens/'+imagem.name)
+      });
+      
+    } catch(erro){
+      let sql = `UPDATE produtos SET nome = '${nome}', valor = ${valor} WHERE codigo = ${codigo}`;
+
+      //executa sql 
+      client.query(sql, (erro, retorno) => {
+        if(erro) throw erro;
+      });
+            
+    }
+    // Redirecionamento
+    res.redirect('/');
+});
+
+   
 //servidor
 app.listen(8080);

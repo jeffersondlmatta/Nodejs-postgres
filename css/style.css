@@ -1,12 +1,21 @@
 
 
-    form{
+form{
         margin-top: 30px; 
         text-align: center;
-    }
-    input{ 
+}
+input{ 
         margin-bottom: 10px;
-    }
+}
+
+form input[type="submit"]{
+    
+    margin-top: 10px;
+}
+form img {
+    width: 200px;
+    margin-bottom: 40px;
+}
 
 .card {
     margin-top: 40px;
